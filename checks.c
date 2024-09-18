@@ -121,3 +121,4 @@ bool contains_only_numbers(char *str) {
     }
     return true;
 }
+

@@ -1,0 +1,84 @@
+#ifndef FUNCTIONS_H_INCLUDED
+#define FUNCTIONS_H_INCLUDED
+
+
+#include "data.h"
+#include "file.h"
+#include <stdio.h>
+/**
+ * @brief Acquisisce i dati da un file e crea uno stack.
+ *
+ * @return t_stackPtr Il puntatore allo stack creato.
+ */
+t_stackPtr acquisition();
+
+/**
+ * @brief Sostituisce un elemento nello stack.
+ *
+ * @param stack Il puntatore allo stack.
+ * @param to_delete L'elemento da eliminare.
+ * @param to_insert L'elemento da inserire al suo posto.
+ */
+void sostitution(t_stackPtr stack, char *to_delete, char *to_insert);
+
+/**
+ * @brief Verifica se un dato è presente nello stack.
+ *
+ * @param stack Il puntatore allo stack.
+ * @param data Il puntatore ai dati da cercare.
+ * @return int La posizione del dato nello stack, o -1 se non presente.
+ */
+int is_present(t_stackPtr stack, t_dataPtr data);
+
+/**
+ * @brief Confronta due dati, sia per le stringhe che per i numeri.
+ *
+ * @param data1 Il primo dato da confrontare.
+ * @param data2 Il secondo dato da confrontare.
+ * @return true Se i dati sono uguali.
+ * @return false Se i dati sono diversi.
+ */
+bool compare_data(t_dataPtr data1, t_dataPtr data2);
+
+/**
+ * @brief Conta il numero di caratteri speciali presenti in una stringa.
+ *
+ * @param string La stringa da analizzare.
+ * @return int Il numero di caratteri speciali trovati.
+ */
+int count_special_chars(const char *string);
+
+/**
+ * @brief Conta il numero di consonanti presenti in una stringa.
+ *
+ * @param string La stringa da analizzare.
+ * @return int Il numero di consonanti trovate.
+ */
+int count_consonants(const char *string);
+
+/**
+ * @brief Confronta due dati in base a criteri specifici.
+ *
+ * @param data1 Il primo dato da confrontare.
+ * @param data2 Il secondo dato da confrontare.
+ * @return int Un valore intero che indica l'ordine dei dati (-1, 0, 1).
+ */
+int compare_criteria(t_dataPtr data1, t_dataPtr data2);
+
+/**
+ * @brief Ordina lo stack in base ai criteri specificati.
+ *
+ * @param stack Il puntatore allo stack.
+ * @param compare La funzione di confronto da utilizzare.
+ * @param ascending Se true, ordina in ordine ascendente; altrimenti, in ordine discendente.
+ */
+void sort_stack(t_stackPtr stack, int (*compare)(t_dataPtr, t_dataPtr), bool ascending);
+
+/**
+ * @brief Permette di scegliere l'ordine di ordinamento (ascendente o discendente) e ordina lo stack.
+ *
+ * @param stack Il puntatore allo stack.
+ */
+void choose_order_and_sort(t_stackPtr stack);
+
+#endif // FUNCTIONS_H_INCLUDED

@@ -1,3 +1,14 @@
+/**
+ * @file main.c
+ * @brief Implementazione di un menu per la gestione di una pila di studenti con operazioni di acquisizione, sostituzione e ordinamento.
+ *
+ * Questo programma permette di gestire una pila di studenti leggendo i dati da file, eseguendo sostituzioni, e ordinando i dati in modo ascendente o discendente.
+ *
+ * @authors:
+ * - Faliero Samuele Belardinelli (mat: 797163)
+ * - Ennio Lo Buono (mat: 801933)
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
@@ -64,17 +75,34 @@ void show_menu() {
                 // write_stack_on_file(sost_file, stack);
                 // print_stack_from_file(sost_file);
 
-                print_stack(stdout, stack);
                 fclose(sost_file);
                 break;
 
             case 3:
                 system("cls");
 
-                handle_sort(stack);
-
-                system("pause");
+                if(stack == NULL) {
+                    printf("acquisire prima di procedere\n");
                     break;
+                }
+
+                // stampa stack per controllo
+                print_stack(stdout, stack);
+
+                // puntatore a file per il registro dello stack ordinato
+                FILE *ord_file = NULL;
+                ord_file = open_file("Ordina.dat", "r+");
+
+                // funzione di ordinamento per punto 3
+                order(stack);
+
+                // write_stack_on_file(sost_file, stack);
+                // print_stack_from_file(sost_file);
+
+                fclose(ord_file);
+
+                system("break");
+                break;
 
             case 4:
                 break;
@@ -83,6 +111,7 @@ void show_menu() {
                 printf("Opzione non valida!\n");
                 break;
         }
+
     } while (choice != n_opt);
 
     destroy_if_defined(&stack);
@@ -145,15 +174,13 @@ void sostitution(t_stackPtr stack, char *to_delete, char *to_insert) {
     t_dataPtr dataToDelete = tokenize_united(to_delete);
     t_dataPtr dataToInsert = tokenize_united(to_insert);
 
-    print_data(stdout, dataToDelete);
-    print_data(stdout, dataToInsert);
-    // Verifica se l'elemento da eliminare è presente
+    // Verifica se l'elemento da eliminare ï¿½ presente
     if (!is_present(stack, dataToDelete)) {
         printf("Errore: elemento da eliminare non trovato.\n");
         return;
     }
 
-    // Se l'elemento è trovato, esegui la sostituzione
+    // Se l'elemento ï¿½ trovato, esegui la sostituzione
     exchange_data(stack, dataToDelete, dataToInsert);
 }
 
@@ -228,8 +255,10 @@ void exchange_data(t_stackPtr stack, t_dataPtr toDelete, t_dataPtr toInsert) {
 
 
 
+
+
 // Definire i puntatori a funzione per l'ordinamento
-typedef int (*compare_func)(t_dataPtr, t_dataPtr);
+typedef int (*asc_desc)(t_dataPtr, t_dataPtr);
 
 // Funzione per calcolare il numero di caratteri speciali
 int count_special_chars(const char *str) {
@@ -256,7 +285,8 @@ int count_consonants(const char *str) {
 }
 
 // Funzione di confronto per l'ordinamento crescente
-int compare_ascending(t_dataPtr a, t_dataPtr b) {
+
+int ascending(t_dataPtr a, t_dataPtr b) {
     int len_a = strlen(get_string(a));
     int len_b = strlen(get_string(b));
 
@@ -274,17 +304,19 @@ int compare_ascending(t_dataPtr a, t_dataPtr b) {
     return cons_a - cons_b;
 }
 
-// Funzione di confronto per l'ordinamento decrescente
-int compare_descending(t_dataPtr a, t_dataPtr b) {
-    return -compare_ascending(a, b);
+int descending(t_dataPtr a, t_dataPtr b) {
+    return -ascending(a, b);
 }
 
+
 // Funzione di ordinamento utilizzando l'insertion sort
-void insertion_sort(t_stackPtr stack, compare_func cmp) {
+void insertion_sort(t_stackPtr stack, asc_desc cmp) {
     t_stackPtr sorted = create_stack();
 
     while (!empty(stack)) {
         t_dataPtr current = pop(stack);
+
+        print_data(stdout, current);
 
         while (!empty(sorted) && cmp(get_head(sorted), current) > 0) {
             push(stack, pop(sorted));
@@ -299,57 +331,79 @@ void insertion_sort(t_stackPtr stack, compare_func cmp) {
     }
 }
 
+
+
 // Funzione per gestire il case 3: ordinamento e salvataggio
-void handle_sort(t_stackPtr stack) {
+void order(t_stackPtr stack) {
 
-    if (empty(stack)) {
-        printf("Acquisire prima di procedere\n");
+    // controllo presenza stack
+    if(stack == NULL) {
+        printf("acquisire prima di proseguire\n");
         return;
     }
 
-    printf("here");
+    // definizione variabile di tipo puntatore a file inizializzata a NULL
+    asc_desc sorting = NULL;
 
-    t_stackPtr stack_ascending = create_stack();
-    t_stackPtr stack_descending = create_stack();
-    t_nodePtr headNode = create_node();
-    t_stackPtr tempStack = create_stack();
+    // "mouse" per scegliere l'opzione
+    int choice;
 
-    // Clonare lo stack originale
-    while (!empty(stack)) {
-        headNode = pop(stack);
-        push(tempStack, headNode);
-        push(stack_ascending, headNode);
-    }
+    // array di opzioni da stampare
+    char *options[] = {"Ascending", "Descending", "Return"};
+    // numero opzioni nell'array
+    int n_opt = sizeof(options)/sizeof(char*);
 
-    printf("here");
+    // loop di controllo input
+    do {
+        // stampa opzioni
+        for(int i = 1; i <= n_opt; i++) {
+            printf("<%d> %s\n", i, options[i-1]);
+        }
 
-    // Ordinare in modo crescente
-    insertion_sort(stack_ascending, compare_ascending);
+        printf("> ");
+        // input numero per il mouse
+        choice = get_input_int();
 
-    // Ordinare in modo decrescente (copia dallo stack temporaneo)
-    while (!empty(tempStack)) {
-        push(stack_descending, pop(tempStack));
-    }
+        switch(choice) {
+            // ASCENDENT definito in functions.h come "1"
+            case ASCENDENT:
+                // assegnare l'indirizzo della funzione "ascending" a asc_desk (linea 255 e 339)
+                sorting = &ascending;
+                break;
 
-    insertion_sort(stack_descending, compare_descending);
+            // DESCENDENT definito in functions.h come "2"
+            case DESCENDENT:
+                // assegnare l'indirizzo della funzione "descending" a asc_desk (linea 255 e 339)
+                sorting = &descending;
+                break;
 
-    // Salvare i risultati su file ordina.dat
-    FILE *file = open_file("ordina.dat", "r+");
+            // RETURN definito in functions.h come "3"
+            case RETURN:
+                // ritorno
+                return;
 
-    if (!file) {
-        printf("Errore nell'apertura del file\n");
+            default:
+                printf("input invalido\n");
+                break;
+        }
+
+    // se una delle opzioni Ã¨ cliccata, continua
+    } while(choice != n_opt && choice != ASCENDENT && choice != DESCENDENT);
+
+    // controlla la selezione di un metodo di sorting
+    if(sorting == NULL) {
+        printf("nessun metodo di sorting selezionato, riprovare\n");
         return;
     }
 
-    write_stack_on_file(file, stack_ascending);  // Salva stack crescente
-    write_stack_on_file(file, stack_descending); // Salva stack decrescente
+    // esecuzione funzione puntata per ordinare stack(passato alla funzione) direttamente
+    insertion_sort(stack, sorting);
+    system("break");
+    // scrittura su file
+    //write_stack_on_file(file, stack);
 
-    printf("\n--- Stack Crescente ---\n");
-    // print_stack_from_file(file); // Legge e stampa lo stack crescente
-    print_stack(stdout, stack_ascending);
-    printf("\n--- Stack Decrescente ---\n");
-    // print_stack_from_file(file); // Legge e stampa lo stack decrescente
-    print_stack(stdout, stack_descending);
+    // lettura da file a console
+    //print_stack_from_file(file, stack);
 
-    fclose(file);
+    print_stack(stdout, stack);
 }

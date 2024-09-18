@@ -12,7 +12,7 @@ FILE *open_file(char *name, char *mode) {
     printf("");
 
     if(file == NULL) {
-        printf("error");
+        printf("error, file missing\n");
         return NULL;
     }
 
