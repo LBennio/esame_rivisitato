@@ -31,6 +31,7 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
+		<Unit filename="Sostituisci.dat" />
 		<Unit filename="checks.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -50,6 +51,7 @@
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="sest.txt" />
 		<Unit filename="stack.c">
 			<Option compilerVar="CC" />
 		</Unit>

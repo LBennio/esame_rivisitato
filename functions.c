@@ -7,6 +7,9 @@
 #include "checks.h"
 #include "file.h"
 
+
+bool compare_data(data, tempData);
+
 void show_menu() {
     t_stackPtr stack = NULL;
     int choice = 0;
@@ -51,41 +54,25 @@ void show_menu() {
 
                 print_stack(stdout, stack);
 
-                char to_delete[MAX_STRING_SIZE + 1] = "\0";
-                char to_insert[MAX_STRING_SIZE + 1] = "\0";
-
-                do {
-                    printf("dati da eliminare (formato esame#numero): ");
-                    fscanf(stdin, "%s", to_delete);
-                    to_delete[strcspn(to_delete, "\n")] = '\0';
-
-                    printf("\ndata to insert (formato esame#numero): ");
-                    fscanf(stdin, "%s", to_insert);
-                    to_insert[strcspn(to_insert, "\n")] = '\0';
-
-                } while(!check_record(to_delete, MAX_RECORD_SIZE, 0) && !check_record(to_insert, MAX_RECORD_SIZE, 0));
-
                 FILE *sost_file = NULL;
                 sost_file = open_file("Sostituisci.dat", "r+");
 
-                sostitution(stack, to_delete, to_insert);
+                substitute(stack);
 
-                if(empty(stack)) {
-                    printf("stack non creato, riprovare\n");
-                    break;
-                }
-
-                //write_stack_on_file(sost_file, stack_sostituzione);
-                //print_stack_from_file(sost_file);
+                write_stack_on_file(sost_file, stack);
+                print_stack_from_file(sost_file);
 
                 print_stack(stdout, stack);
                 fclose(sost_file);
                 break;
 
-            case 3: {
+            case 3:
+                system("cls");
 
-                break;
-            }
+                handle_sort(stack);
+
+                system("pause");
+                    break;
 
             case 4:
                 break;
@@ -99,9 +86,9 @@ void show_menu() {
     destroy_if_defined(&stack);
 }
 
-t_stackPtr acquisition() {
+t_stackPtr acquisition(t_stackPtr stack) {
     FILE *filePtr = NULL;
-    t_stackPtr stack = NULL;
+    t_stackPtr tempStack = NULL;
 
     char nome[MAX_STRING_SIZE];
 
@@ -126,10 +113,28 @@ t_stackPtr acquisition() {
         printf("yupp file");
         return NULL;
     }
-    stack = read_file(filePtr);
+    tempStack = read_file(filePtr);
     close_file(filePtr);
 
-    return stack;
+    return tempStack;
+}
+
+void substitute(t_stackPtr stack) {
+    char to_delete[MAX_STRING_SIZE + 1] = "\0";
+    char to_insert[MAX_STRING_SIZE + 1] = "\0";
+
+    do {
+        printf("dati da eliminare (formato esame#numero): ");
+        fscanf(stdin, "%s", to_delete);
+        to_delete[strcspn(to_delete, "\n")] = '\0';
+
+        printf("\ndata to insert (formato esame#numero): ");
+        fscanf(stdin, "%s", to_insert);
+        to_insert[strcspn(to_insert, "\n")] = '\0';
+
+    } while(!check_record(to_delete, MAX_RECORD_SIZE, 0) && !check_record(to_insert, MAX_RECORD_SIZE, 0));
+
+    sostitution(stack, to_delete, to_insert);
 }
 
 void sostitution(t_stackPtr stack, char *to_delete, char *to_insert) {
@@ -139,32 +144,168 @@ void sostitution(t_stackPtr stack, char *to_delete, char *to_insert) {
     int node_number = 0;
 
     tempData = tokenize(to_delete, 0);
+
     printf("%s %d", get_string(tempData), get_number(tempData));
 
-    if((node_number = is_present(stack, tempData))) {
+    if(is_present(stack, tempData)) {
         printf("stringa ricercata non trovata\n");
         return;
     }
 
+    exchange_data(stack, tempData);
 }
 
-int is_present(t_stackPtr stack, t_dataPtr data) {
+bool is_present(t_stackPtr stack, t_dataPtr data) {
     t_stackPtr tempStack = create_stack();
     t_dataPtr tempData = NULL;
 
     while(!empty(stack)) {
         tempData = pop(stack);
         if(compare_data(data, tempData)) {
-
+            printf("elemento non trovato nella pila\n");
+            return false;
         }
 
         push(stack, tempData);
     }
 
-
     return NULL;
 }
 
 bool compare_data(data, tempData) {
+    if(strcmp(get_string(data), get_string(tempData)) == 0 && get_number(data) == get_number(tempData)) {
+        return false;
+    }
 
+    return true;
+}
+
+void exchange_data(t_stackPtr stack, t_dataPtr to_Exchange) {
+
+}
+
+// Definire i puntatori a funzione per l'ordinamento
+typedef int (*compare_func)(t_dataPtr, t_dataPtr);
+
+// Funzione per calcolare il numero di caratteri speciali
+int count_special_chars(const char *str) {
+    int count = 0;
+    while (*str) {
+        if (!isalnum(*str)) {
+            count++;
+        }
+        str++;
+    }
+    return count;
+}
+
+// Funzione per calcolare il numero di consonanti
+int count_consonants(const char *str) {
+    int count = 0;
+    while (*str) {
+        if (isalpha(*str) && !strchr("AEIOUaeiou", *str)) {
+            count++;
+        }
+        str++;
+    }
+    return count;
+}
+
+// Funzione di confronto per l'ordinamento crescente
+int compare_ascending(t_dataPtr a, t_dataPtr b) {
+    int len_a = strlen(get_string(a));
+    int len_b = strlen(get_string(b));
+
+    // Prima criterio: numero di caratteri
+    if (len_a != len_b) return len_a - len_b;
+
+    // Secondo criterio: numero di caratteri speciali
+    int spec_a = count_special_chars(get_string(a));
+    int spec_b = count_special_chars(get_string(b));
+    if (spec_a != spec_b) return spec_a - spec_b;
+
+    // Terzo criterio: numero di consonanti
+    int cons_a = count_consonants(get_string(a));
+    int cons_b = count_consonants(get_string(b));
+    return cons_a - cons_b;
+}
+
+// Funzione di confronto per l'ordinamento decrescente
+int compare_descending(t_dataPtr a, t_dataPtr b) {
+    return -compare_ascending(a, b);
+}
+
+// Funzione di ordinamento utilizzando l'insertion sort
+void insertion_sort(t_stackPtr stack, compare_func cmp) {
+    t_stackPtr sorted = create_stack();
+
+    while (!empty(stack)) {
+        t_dataPtr current = pop(stack);
+
+        while (!empty(sorted) && cmp(get_head(sorted), current) > 0) {
+            push(stack, pop(sorted));
+        }
+
+        push(sorted, current);
+    }
+
+    // Riempire lo stack originale ordinato
+    while (!empty(sorted)) {
+        push(stack, pop(sorted));
+    }
+}
+
+// Funzione per gestire il case 3: ordinamento e salvataggio
+void handle_sort(t_stackPtr stack) {
+
+    if (empty(stack)) {
+        printf("Acquisire prima di procedere\n");
+        return;
+    }
+
+    printf("here");
+
+    t_stackPtr stack_ascending = create_stack();
+    t_stackPtr stack_descending = create_stack();
+    t_nodePtr headNode = create_node();
+    t_stackPtr tempStack = create_stack();
+
+    // Clonare lo stack originale
+    while (!empty(stack)) {
+        headNode = pop(stack);
+        push(tempStack, headNode);
+        push(stack_ascending, headNode);
+    }
+
+    printf("here");
+
+    // Ordinare in modo crescente
+    insertion_sort(stack_ascending, compare_ascending);
+
+    // Ordinare in modo decrescente (copia dallo stack temporaneo)
+    while (!empty(tempStack)) {
+        push(stack_descending, pop(tempStack));
+    }
+
+    insertion_sort(stack_descending, compare_descending);
+
+    // Salvare i risultati su file ordina.dat
+    FILE *file = open_file("ordina.dat", "r+");
+
+    if (!file) {
+        printf("Errore nell'apertura del file\n");
+        return;
+    }
+
+    write_stack_on_file(file, stack_ascending);  // Salva stack crescente
+    write_stack_on_file(file, stack_descending); // Salva stack decrescente
+
+    printf("\n--- Stack Crescente ---\n");
+    // print_stack_from_file(file); // Legge e stampa lo stack crescente
+    print_stack(stdout, stack_ascending);
+    printf("\n--- Stack Decrescente ---\n");
+    // print_stack_from_file(file); // Legge e stampa lo stack decrescente
+    print_stack(stdout, stack_descending);
+
+    fclose(file);
 }
