@@ -62,69 +62,46 @@ t_dataPtr tokenize(char *input, int idx) {
     char *string = NULL;
     int number = 0;
 
-    // Crea la struttura dati
     t_dataPtr data = create_data();
-    if (data == NULL) {
-        printf("Errore di allocazione memoria per i dati.\n");
-        return NULL;
-    }
 
-    // Ottieni il primo token (la parte prima del separatore #)
     token = strtok(input, NUMBER_SEPARATOR);
-    if (token == NULL) {
-        printf("Errore: formato non valido al record %d, manca il separatore '#'.\n", idx);
-        return NULL;
-    }
-
-    // Connetti la stringa ignorando i trattini
     string = connect_string(token, idx);
-    if (string == NULL) {
-        return NULL;  // Restituisci NULL se connect_string fallisce
-    }
 
-    // Ottieni il secondo token (la parte numerica dopo il #)
     token = strtok(NULL, NUMBER_SEPARATOR);
-    if (token == NULL || !contains_only_numbers(token)) {
-        printf("Errore: numero non conforme al record %d.\n", idx);
-        free(string);  // Libera la memoria
-        return NULL;
+    if(!contains_only_numbers(token)) {
+        printf("numero non conforme at record %d\n", idx);
     }
+    number = atoi(token);
 
-    number = atoi(token);  // Converte il token in numero
-
-    // Imposta i dati nella struttura
     set_string(data, string);
     set_number(data, number);
 
-    free(string);  // Libera la memoria della stringa
+    free(string);
 
     return data;
 }
 
 char *connect_string(char *token, int idx) {
-    if (token == NULL) {
-        printf("Errore: input mancante al record %d\n", idx);
-        return NULL;
-    }
 
-    // Alloca memoria per la nuova stringa
-    char *string = (char *)malloc((strlen(token) + 1) * sizeof(char));  // +1 per il terminatore nullo
-    if (string == NULL) {
-        printf("Errore di allocazione memoria al record %d.\n", idx);
-        return NULL;
-    }
-
+    char *string = (char *)malloc((strlen(token) + 1) * sizeof(char));  // +1 for the null terminator
     int j = 0;
-    // Copia i caratteri ignorando i trattini
+
+    if (token == NULL) {
+        printf("Input mancante al record %d\n", idx);
+        return NULL;
+    }
+
+    // Loop through the token and copy characters to string, ignoring RECORD_SEPARATOR
     for (int i = 0; i < strlen(token); i++) {
         if (token[i] != '-') {
-            string[j++] = token[i];
+            string[j] = token[i];
+            j++;
         }
     }
 
-    string[j] = '\0';  // Aggiungi il terminatore di stringa
+    string[j] = '\0';  // Null-terminate the string
 
-    return string;
+    return string;  // Return the processed string
 }
 
 void close_file(FILE *file) {

@@ -9,6 +9,7 @@
 
 
 bool compare_data(data, tempData);
+bool is_present(t_stackPtr stack, t_dataPtr data);
 
 void show_menu() {
     t_stackPtr stack = NULL;
@@ -47,7 +48,7 @@ void show_menu() {
             case 2:
                 system("cls");
 
-                if(empty(stack)) {
+                if(stack == NULL) {
                     printf("acquisire prima di procedere\n");
                     break;
                 }
@@ -123,66 +124,85 @@ void substitute(t_stackPtr stack) {
     char to_delete[MAX_STRING_SIZE + 1] = "\0";
     char to_insert[MAX_STRING_SIZE + 1] = "\0";
 
+    // Ciclo per assicurarsi che entrambi i record siano validi
     do {
-        printf("dati da eliminare (formato esame#numero): ");
+        printf("Dati da eliminare (formato esame#numero): ");
         fscanf(stdin, "%s", to_delete);
         to_delete[strcspn(to_delete, "\n")] = '\0';
 
-        printf("\ndata to insert (formato esame#numero): ");
+        printf("\nDati da inserire (formato esame#numero): ");
         fscanf(stdin, "%s", to_insert);
         to_insert[strcspn(to_insert, "\n")] = '\0';
+    } while (!check_record(to_delete, MAX_RECORD_SIZE, 0) || !check_record(to_insert, MAX_RECORD_SIZE, 0));
 
-    } while(!check_record(to_delete, MAX_RECORD_SIZE, 0) && !check_record(to_insert, MAX_RECORD_SIZE, 0));
-
+    // Chiamata alla funzione di sostituzione
     sostitution(stack, to_delete, to_insert);
 }
 
 void sostitution(t_stackPtr stack, char *to_delete, char *to_insert) {
-    t_stackPtr tempStack = NULL;
-    t_dataPtr tempData = NULL;
+    // Tokenizza i dati da eliminare e quelli da inserire
+    t_dataPtr dataToDelete = tokenize(to_delete, 0);
+    t_dataPtr dataToInsert = tokenize(to_insert, 0);
 
-    int node_number = 0;
-
-    tempData = tokenize(to_delete, 0);
-
-    printf("%s %d", get_string(tempData), get_number(tempData));
-
-    if(is_present(stack, tempData)) {
-        printf("stringa ricercata non trovata\n");
+    // Verifica se l'elemento da eliminare è presente
+    if (!is_present(stack, dataToDelete)) {
+        printf("Errore: elemento da eliminare non trovato.\n");
         return;
     }
 
-    exchange_data(stack, tempData);
+    // Se l'elemento è trovato, esegui la sostituzione
+    exchange_data(stack, dataToDelete, dataToInsert);
 }
 
 bool is_present(t_stackPtr stack, t_dataPtr data) {
     t_stackPtr tempStack = create_stack();
     t_dataPtr tempData = NULL;
+    bool found = false;
 
-    while(!empty(stack)) {
+    // Cerca l'elemento nel stack
+    while (!empty(stack)) {
         tempData = pop(stack);
-        if(compare_data(data, tempData)) {
-            printf("elemento non trovato nella pila\n");
-            return false;
+        if (compare_data(data, tempData)) {
+            found = true;
         }
-
-        push(stack, tempData);
+        push(tempStack, tempData);  // Ricostruisce lo stack temporaneo
     }
 
-    return NULL;
-}
-
-bool compare_data(data, tempData) {
-    if(strcmp(get_string(data), get_string(tempData)) == 0 && get_number(data) == get_number(tempData)) {
-        return false;
+    // Ripristina lo stack originale
+    while (!empty(tempStack)) {
+        push(stack, pop(tempStack));
     }
 
-    return true;
+    destroy_if_defined(&tempStack);  // Libera la memoria temporanea
+    return found;
 }
 
-void exchange_data(t_stackPtr stack, t_dataPtr to_Exchange) {
-
+bool compare_data(t_dataPtr data1, t_dataPtr data2) {
+    return (strcmp(get_string(data1), get_string(data2)) == 0 && get_number(data1) == get_number(data2));
 }
+
+void exchange_data(t_stackPtr stack, t_dataPtr toDelete, t_dataPtr toInsert) {
+    t_stackPtr tempStack = create_stack();
+    t_dataPtr tempData = NULL;
+
+    // Cerca e sostituisce l'elemento
+    while (!empty(stack)) {
+        tempData = pop(stack);
+        if (compare_data(tempData, toDelete)) {
+            push(tempStack, toInsert);  // Sostituisce l'elemento
+        } else {
+            push(tempStack, tempData);  // Mantiene l'elemento esistente
+        }
+    }
+
+    // Ripristina lo stack originale
+    while (!empty(tempStack)) {
+        push(stack, pop(tempStack));
+    }
+
+    destroy_if_defined(&tempStack);  // Libera la memoria temporanea
+}
+
 
 // Definire i puntatori a funzione per l'ordinamento
 typedef int (*compare_func)(t_dataPtr, t_dataPtr);
