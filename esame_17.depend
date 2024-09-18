@@ -10,7 +10,7 @@
 1726665376 c:\users\pc\onedrive\desktop\progetti\codeblocks\esame_17\data.h
 	<stdio.h>
 
-1726671761 source:c:\users\pc\onedrive\desktop\progetti\codeblocks\esame_17\file.c
+1726685780 source:c:\users\pc\onedrive\desktop\progetti\codeblocks\esame_17\file.c
 	<stdio.h>
 	<stdlib.h>
 	<string.h>
@@ -52,7 +52,7 @@
 	<stdbool.h>
 	"data.h"
 
-1726676281 source:c:\users\pc\onedrive\desktop\progetti\codeblocks\esame_17\functions.c
+1726685024 source:c:\users\pc\onedrive\desktop\progetti\codeblocks\esame_17\functions.c
 	<stdio.h>
 	<stdlib.h>
 	<stdbool.h>

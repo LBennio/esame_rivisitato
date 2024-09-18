@@ -116,22 +116,33 @@ void write_stack_on_file(FILE *file, t_stackPtr stack) {
     if(!assert_file_opened(file, "file non esistente, fornire il file su cui si desidera scrivere")) {
         return;
     }
+    rewind(file);
 
     print_stack(file, stack);
 }
 
 void print_stack_from_file(FILE *file) {
-    t_dataPtr tempData = create_data();
-
-    if(!assert_file_opened(file, "file non trovato")) {
+    if (!assert_file_opened(file, "file non trovato")) {
         return;
     }
 
     char line[MAX_RECORD_SIZE + 1] = "\0";
+    t_dataPtr tempData = NULL;
 
-    while(fgets(line, MAX_RECORD_SIZE, file)) {
-        tempData = tokenize(line, 0);
+    while (fgets(line, sizeof(line), file)) {
+        line[strcspn(line, "\n")] = '\0';
+
+        tempData = tokenize_united(line);
+        if (tempData == NULL) {
+            printf("Errore nella tokenizzazione dei dati\n");
+            continue;
+        }
 
         print_data(stdout, tempData);
+
+        destroy_if_defined(&tempData);
+        tempData = NULL;
     }
+
+    rewind(file);
 }

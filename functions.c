@@ -10,6 +10,7 @@
 
 bool compare_data(data, tempData);
 bool is_present(t_stackPtr stack, t_dataPtr data);
+t_dataPtr tokenize_united(char *input_string);
 
 void show_menu() {
     t_stackPtr stack = NULL;
@@ -141,9 +142,11 @@ void substitute(t_stackPtr stack) {
 
 void sostitution(t_stackPtr stack, char *to_delete, char *to_insert) {
     // Tokenizza i dati da eliminare e quelli da inserire
-    t_dataPtr dataToDelete = tokenize(to_delete, 0);
-    t_dataPtr dataToInsert = tokenize(to_insert, 0);
+    t_dataPtr dataToDelete = tokenize_united(to_delete);
+    t_dataPtr dataToInsert = tokenize_united(to_insert);
 
+    print_data(stdout, dataToDelete);
+    print_data(stdout, dataToInsert);
     // Verifica se l'elemento da eliminare è presente
     if (!is_present(stack, dataToDelete)) {
         printf("Errore: elemento da eliminare non trovato.\n");
@@ -181,6 +184,26 @@ bool compare_data(t_dataPtr data1, t_dataPtr data2) {
     return (strcmp(get_string(data1), get_string(data2)) == 0 && get_number(data1) == get_number(data2));
 }
 
+t_dataPtr tokenize_united(char *input_string) {
+    char *token = NULL;
+    int number = 0;
+
+    t_dataPtr data = create_data();
+
+    token = strtok(input_string, NUMBER_SEPARATOR);
+    set_string(data, token);
+
+    token = strtok(NULL, NUMBER_SEPARATOR);
+    if(!contains_only_numbers(token)) {
+        printf("numero non conforme nel record inserito\n");
+    }
+    number = atoi(token);
+
+    set_number(data, number);
+
+    return data;
+}
+
 void exchange_data(t_stackPtr stack, t_dataPtr toDelete, t_dataPtr toInsert) {
     t_stackPtr tempStack = create_stack();
     t_dataPtr tempData = NULL;
@@ -202,6 +225,7 @@ void exchange_data(t_stackPtr stack, t_dataPtr toDelete, t_dataPtr toInsert) {
 
     destroy_if_defined(&tempStack);  // Libera la memoria temporanea
 }
+
 
 
 // Definire i puntatori a funzione per l'ordinamento
