@@ -1,0 +1,61 @@
+# depslib dependency file v1.0
+1726638457 source:c:\users\pc\onedrive\desktop\progetti\codeblocks\esame_17\data.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	"data.h"
+	"stack.h"
+
+1726637549 c:\users\pc\onedrive\desktop\progetti\codeblocks\esame_17\data.h
+	<stdio.h>
+
+1726637623 source:c:\users\pc\onedrive\desktop\progetti\codeblocks\esame_17\file.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	"file.h"
+	"data.h"
+	"checks.h"
+
+1726612244 c:\users\pc\onedrive\desktop\progetti\codeblocks\esame_17\file.h
+	<stdio.h>
+	"stack.h"
+	"data.h"
+
+1726587065 source:c:\users\pc\onedrive\desktop\progetti\codeblocks\esame_17\main.c
+	"functions.h"
+
+1726588049 c:\users\pc\onedrive\desktop\progetti\codeblocks\esame_17\functions.h
+	"stack.h"
+	"data.h"
+
+1726598321 source:c:\users\pc\onedrive\desktop\progetti\codeblocks\esame_17\checks.c
+	<conio.h>
+	<stdio.h>
+	<stdbool.h>
+	<ctype.h>
+	"checks.h"
+
+1726600075 c:\users\pc\onedrive\desktop\progetti\codeblocks\esame_17\checks.h
+	"data.h"
+
+1726639920 source:c:\users\pc\onedrive\desktop\progetti\codeblocks\esame_17\stack.c
+	<stdio.h>
+	<stdlib.h>
+	<stdbool.h>
+	"stack.h"
+	"data.h"
+
+1726637687 c:\users\pc\onedrive\desktop\progetti\codeblocks\esame_17\stack.h
+	<stdbool.h>
+	"data.h"
+
+1726639285 source:c:\users\pc\onedrive\desktop\progetti\codeblocks\esame_17\functions.c
+	<stdio.h>
+	<stdlib.h>
+	"functions.h"
+	"data.h"
+	"stack.h"
+	"checks.h"
+	"file.h"
+
