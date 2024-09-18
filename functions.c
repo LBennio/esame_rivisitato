@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include "functions.h"
 #include "data.h"
 #include "stack.h"
@@ -8,7 +9,6 @@
 
 void show_menu() {
     t_stackPtr stack = NULL;
-    t_stackPtr stack_sostituzione = NULL;
     int choice = 0;
 
     printf("---- studenti ----\n");
@@ -29,7 +29,6 @@ void show_menu() {
                 system("cls");
 
                 destroy_if_defined(&stack);
-                destroy_if_defined(&stack_sostituzione);
 
                 stack = acquisition();
 
@@ -43,18 +42,44 @@ void show_menu() {
                 break;
 
             case 2:
-                FILE *sost_file = open_file("Sostituisci.dat", "r+");
+                system("cls");
 
-                destroy_if_defined(&stack_sostituzione);
-                stack_sostituzione = sostitution();
+                if(empty(stack)) {
+                    printf("acquisire prima di procedere\n");
+                    break;
+                }
+
+                print_stack(stdout, stack);
+
+                char to_delete[MAX_STRING_SIZE + 1] = "\0";
+                char to_insert[MAX_STRING_SIZE + 1] = "\0";
+
+                do {
+                    printf("dati da eliminare (formato esame#numero): ");
+                    fscanf(stdin, "%s", to_delete);
+                    to_delete[strcspn(to_delete, "\n")] = '\0';
+
+                    printf("\ndata to insert (formato esame#numero): ");
+                    fscanf(stdin, "%s", to_insert);
+                    to_insert[strcspn(to_insert, "\n")] = '\0';
+
+                } while(!check_record(to_delete, MAX_RECORD_SIZE, 0) && !check_record(to_insert, MAX_RECORD_SIZE, 0));
+
+                FILE *sost_file = NULL;
+                sost_file = open_file("Sostituisci.dat", "r+");
+
+                sostitution(stack, to_delete, to_insert);
 
                 if(empty(stack)) {
                     printf("stack non creato, riprovare\n");
                     break;
                 }
 
-                write_stack_on_file(sost_file, stack_sostituzione);
-                print_stack_from_file(sost_file);
+                //write_stack_on_file(sost_file, stack_sostituzione);
+                //print_stack_from_file(sost_file);
+
+                print_stack(stdout, stack);
+                fclose(sost_file);
                 break;
 
             case 3: {
@@ -105,4 +130,41 @@ t_stackPtr acquisition() {
     close_file(filePtr);
 
     return stack;
+}
+
+void sostitution(t_stackPtr stack, char *to_delete, char *to_insert) {
+    t_stackPtr tempStack = NULL;
+    t_dataPtr tempData = NULL;
+
+    int node_number = 0;
+
+    tempData = tokenize(to_delete, 0);
+    printf("%s %d", get_string(tempData), get_number(tempData));
+
+    if((node_number = is_present(stack, tempData))) {
+        printf("stringa ricercata non trovata\n");
+        return;
+    }
+
+}
+
+int is_present(t_stackPtr stack, t_dataPtr data) {
+    t_stackPtr tempStack = create_stack();
+    t_dataPtr tempData = NULL;
+
+    while(!empty(stack)) {
+        tempData = pop(stack);
+        if(compare_data(data, tempData)) {
+
+        }
+
+        push(stack, tempData);
+    }
+
+
+    return NULL;
+}
+
+bool compare_data(data, tempData) {
+
 }

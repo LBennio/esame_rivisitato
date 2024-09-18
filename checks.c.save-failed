@@ -12,6 +12,15 @@ int get_input_int() {
     return n - '0';
 }
 
+char *get_input_string() {
+    char string[MAX_STRING_SIZE + 1] = "\0";
+
+    fscanf(stdin, "%s", string);
+    string[strcspn(string, "\n")] = '\0';
+
+    return string;
+}
+
 bool check_txt(char *nome) {
     int len = strlen(nome);
     return (strcmp(nome + len - 4, ".txt") != 0 || len < 4);
@@ -66,13 +75,9 @@ bool is_valid(char *string) {
     return true;
 }
 
-bool check_record(char *in, int max_length, int idx) {
+bool check_record(char *input, int max_length, int idx) {
     char *token = NULL;
     int i;
-
-    char input[MAX_STRING_SIZE + 1] = "\0";
-
-    strcpy(input, in);
 
     token = strtok(input, NUMBER_SEPARATOR);
     char *num = strtok(NULL, "\n");
@@ -96,7 +101,7 @@ bool check_record(char *in, int max_length, int idx) {
 
     while (c_token != NULL) {
 
-        if (strlen(c_token) > max_length || !islower(c_token[0])) {
+        if (strlen(c_token) != max_length || !islower(c_token[0])) {
             printf("carattere non valido al record %d\n", idx);
             return false;
         }

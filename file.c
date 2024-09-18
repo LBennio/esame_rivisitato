@@ -38,7 +38,7 @@ t_stackPtr read_file(FILE *file) {
             return NULL;
         }
 
-        if (check_record(string_temp, i)) {
+        if (check_record(string_temp, 1, i)) {
             tempData = tokenize(string_read, i);
             push(stack, tempData);
 

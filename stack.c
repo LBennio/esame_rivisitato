@@ -145,7 +145,6 @@ t_dataPtr get_data(t_nodePtr node) {
     return node->data;
 }
 
-
 void clear_stack(t_stackPtr stack) {
     while(!empty(stack)) {
         t_dataPtr data = pop(stack);

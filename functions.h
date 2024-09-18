@@ -6,5 +6,6 @@
 
 void show_menu();
 t_stackPtr acquisition();
+void sostitution(t_stackPtr stack, char *to_delete, char *to_insert);
 
 #endif // FUNCTIONS_H_INCLUDED
