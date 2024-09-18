@@ -61,8 +61,8 @@ void show_menu() {
 
                 substitute(stack);
 
-                write_stack_on_file(sost_file, stack);
-                print_stack_from_file(sost_file);
+                // write_stack_on_file(sost_file, stack);
+                // print_stack_from_file(sost_file);
 
                 print_stack(stdout, stack);
                 fclose(sost_file);
